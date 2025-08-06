@@ -1,10 +1,33 @@
 <script setup>
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
-import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
-const checked = ref(false);
+const rememberMe = ref(false);
+const showPassword = ref(false);
+
+const loading = computed(() => authStore.loading);
+const error = computed(() => authStore.error);
+
+const handleLogin = async () => {
+    authStore.clearError();
+
+    const result = await authStore.login(email.value, password.value);
+
+    if (result.success) {
+        router.push('/');
+    }
+};
+
+const forgotPassword = () => {
+    router.push('/forgot-password');
+};
 </script>
 
 <template>
@@ -19,6 +42,10 @@ const checked = ref(false);
                         </svg>
                     </div>
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bonjour</h1>
+
+                    <div v-if="error" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                        {{ error }}
+                    </div>
                 </div>
 
                 <div class="px-8 pb-8">
@@ -31,7 +58,8 @@ const checked = ref(false);
                                     v-model="email"
                                     type="email"
                                     required
-                                    class="w-full px-4 py-3 pl-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                                    :disabled="loading"
+                                    class="w-full px-4 py-3 pl-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="votre@email.com"
                                 />
                                 <svg class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,13 +76,14 @@ const checked = ref(false);
                                     v-model="password"
                                     :type="showPassword ? 'text' : 'password'"
                                     required
-                                    class="w-full px-4 py-3 pl-12 pr-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                                    :disabled="loading"
+                                    class="w-full px-4 py-3 pl-12 pr-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="••••••••"
                                 />
                                 <svg class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
-                                <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                <button type="button" @click="showPassword = !showPassword" :disabled="loading" class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:cursor-not-allowed">
                                     <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -76,11 +105,19 @@ const checked = ref(false);
                                 <input
                                     v-model="rememberMe"
                                     type="checkbox"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                    :disabled="loading"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 disabled:cursor-not-allowed"
                                 />
                                 <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Se souvenir de moi</span>
                             </label>
-                            <button type="button" @click="forgotPassword" class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors">Mot de passe oublié ?</button>
+                            <button
+                                type="button"
+                                @click="forgotPassword"
+                                :disabled="loading"
+                                class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                Mot de passe oublié ?
+                            </button>
                         </div>
 
                         <button

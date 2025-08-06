@@ -1,5 +1,6 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import { requireAuth, requireGuest } from './guards/auth';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -11,7 +12,12 @@ const router = createRouter({
                 {
                     path: '/',
                     name: 'dashboard',
-                    component: () => import('@/views/Dashboard.vue')
+                    component: () => import('@/views/Dashboard.vue'),
+                    beforeEnter: requireAuth,
+                    meta: {
+                        title: 'Tableau de bord',
+                        requiresAuth: true
+                    }
                 },
                 {
                     path: '/uikit/formlayout',
@@ -120,7 +126,12 @@ const router = createRouter({
         {
             path: '/auth/login',
             name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
+            component: () => import('@/views/pages/auth/Login.vue'),
+            beforeEnter: requireGuest,
+            meta: {
+                title: 'Connexion',
+                requiresGuest: true
+            }
         },
         {
             path: '/auth/access',
