@@ -121,15 +121,14 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        async refreshProfile() {
+        async getProfile() {
             try {
                 const user = await authService.getProfile();
                 this.user = user;
+                return user;
             } catch (error) {
-                console.error('Erreur lors du rafraîchissement du profil:', error);
-                if (error.response?.status === 401) {
-                    this.logout();
-                }
+                console.error('Erreur lors de la récupération du profil:', error);
+                throw error;
             }
         },
 
@@ -139,8 +138,6 @@ export const useAuthStore = defineStore('auth', {
                 this.roles = authService.getRoles();
                 this.permissions = authService.getPermissions();
                 this.isAuthenticated = true;
-
-                this.refreshProfile();
             }
         },
 

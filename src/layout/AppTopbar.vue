@@ -1,7 +1,7 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth';
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
 
@@ -36,10 +36,6 @@ const goToAdmin = () => {
 
 const canAccessAdmin = computed(() => {
     return roles.value?.includes('admin') || permissions.value?.includes('admin.*');
-});
-
-onMounted(() => {
-    authStore.refreshProfile();
 });
 </script>
 

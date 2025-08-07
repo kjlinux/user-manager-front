@@ -93,7 +93,13 @@ const fetchRoles = async () => {
 };
 
 function openNew() {
-    user.value = {};
+    user.value = {
+        name: '',
+        email: '',
+        password: '',
+        role_id: null,
+        selectedRole: null
+    };
     submitted.value = false;
     userDialog.value = true;
 }
@@ -106,18 +112,30 @@ function hideDialog() {
 async function saveUser() {
     submitted.value = true;
 
+    if (user.value.selectedRole && user.value.selectedRole.id) {
+        user.value.role_id = user.value.selectedRole.id;
+    }
+
     if (user.value.name?.trim() && user.value.email?.trim() && user.value.role_id) {
         try {
             if (user.value.id) {
                 await apiClient.put(`/auth/users/${user.value.id}`, user.value);
                 toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur mis à jour', life: 3000 });
             } else {
-                await apiClient.post('/auth/users/register', user.value);
+                const userData = {
+                    name: user.value.name,
+                    email: user.value.email,
+                    role_id: user.value.role_id,
+                    password: user.value.password || undefined
+                };
+
+                await apiClient.post('/auth/users/register', userData);
                 toast.add({ severity: 'success', summary: 'Succès', detail: 'Utilisateur créé', life: 3000 });
             }
 
             userDialog.value = false;
             user.value = {};
+            submitted.value = false;
 
             await refreshData();
         } catch (error) {
@@ -479,6 +497,23 @@ function getStatusLabel(status) {
                 </div>
 
                 <div>
+                    <label for="userRole" class="block font-bold mb-2">Rôle</label>
+                    <AutoComplete
+                        id="userRole"
+                        v-model="user.selectedRole"
+                        :suggestions="filteredRoles"
+                        optionLabel="name"
+                        dropdown
+                        @complete="searchRolesByName"
+                        placeholder="Rechercher un rôle"
+                        @item-select="(e) => (user.role_id = e.value.id)"
+                        :invalid="submitted && !user.role_id"
+                        fluid
+                    />
+                    <small v-if="submitted && !user.role_id" class="text-red-500"> Le rôle est obligatoire. </small>
+                </div>
+
+                <div>
                     <label for="password" class="block font-bold mb-2">Mot de passe</label>
                     <InputText id="password" v-model="user.password" type="password" fluid />
                     <small class="text-gray-500"> Laissez vide pour générer un mot de passe aléatoire ou conserver l'actuel. </small>
@@ -535,9 +570,8 @@ function getStatusLabel(status) {
                     <p>Aucun utilisateur supprimé</p>
                 </div>
                 <DataTable v-else :value="blockedUsers" dataKey="id">
-                    <Column field="username" header="Nom d'utilisateur"></Column>
                     <Column field="email" header="Email"></Column>
-                    <Column field="name" header="Nom complet">
+                    <Column field="name" header="Nom">
                         <template #body="slotProps">
                             {{ getFullName(slotProps.data) }}
                         </template>

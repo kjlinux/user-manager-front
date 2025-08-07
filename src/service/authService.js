@@ -13,11 +13,9 @@ class AuthService {
             (response) => response,
             async (error) => {
                 if (error.response?.status === 401) {
-                    try {
-                        await this.refresh();
-                        return axios.request(error.config);
-                    } catch (refreshError) {
-                        this.logout();
+                    this.logout();
+                    
+                    if (window.location.pathname !== '/auth/login') {
                         window.location.href = '/auth/login';
                     }
                 }
@@ -87,15 +85,6 @@ class AuthService {
             localStorage.removeItem('roles');
             localStorage.removeItem('permissions');
             localStorage.removeItem('isAuthenticated');
-        }
-    }
-
-    async refresh() {
-        try {
-            const response = await axios.get(`${this.baseURL}/users/refresh`);
-            return response.data.status === 'success';
-        } catch (error) {
-            throw error;
         }
     }
 
