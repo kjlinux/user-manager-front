@@ -45,6 +45,9 @@ const filters = ref({
 const submitted = ref(false);
 const filteredRoles = ref([]);
 
+// Configuration de l'URL de base pour les images
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 onMounted(async () => {
     await fetchRoles();
     await loadUsers();
@@ -405,6 +408,22 @@ function getStatusLabel(status) {
         return status || 'Inconnu';
     }
 }
+
+// Fonction pour construire l'URL complète de l'image
+function getProfilePhotoUrl(user) {
+    if (user && user.profile_photo && user.profile_photo.file) {
+        return `${API_BASE_URL}/storage/${user.profile_photo.file}`;
+    }
+    return null;
+}
+
+// Fonction pour gérer les erreurs de chargement d'image
+function handleImageError(event) {
+    // Remplacer par une image par défaut ou masquer l'image
+    event.target.style.display = 'none';
+    // Ou vous pouvez définir une image par défaut :
+    // event.target.src = '/path/to/default-avatar.png';
+}
 </script>
 
 <template>
@@ -447,6 +466,26 @@ function getStatusLabel(status) {
                 </template>
 
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+
+                <!-- Nouvelle colonne pour la photo de profil -->
+                <Column header="Photo" style="width: 5rem" :exportable="false">
+                    <template #body="slotProps">
+                        <div class="flex justify-center">
+                            <img
+                                v-if="getProfilePhotoUrl(slotProps.data)"
+                                :src="getProfilePhotoUrl(slotProps.data)"
+                                :alt="`Photo de ${getFullName(slotProps.data)}`"
+                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                                @error="handleImageError"
+                                v-tooltip.top="getFullName(slotProps.data)"
+                            />
+                            <div v-else class="w-10 h-10 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center" v-tooltip.top="getFullName(slotProps.data)">
+                                <i class="pi pi-user text-gray-500"></i>
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+
                 <Column field="email" header="Email" sortable style="min-width: 14rem"></Column>
                 <Column field="name" header="Nom" sortable style="min-width: 12rem">
                     <template #body="slotProps">
@@ -570,6 +609,23 @@ function getStatusLabel(status) {
                     <p>Aucun utilisateur supprimé</p>
                 </div>
                 <DataTable v-else :value="blockedUsers" dataKey="id">
+                    <!-- Photo de profil dans les utilisateurs supprimés aussi -->
+                    <Column header="Photo" style="width: 5rem">
+                        <template #body="slotProps">
+                            <div class="flex justify-center">
+                                <img
+                                    v-if="getProfilePhotoUrl(slotProps.data)"
+                                    :src="getProfilePhotoUrl(slotProps.data)"
+                                    :alt="`Photo de ${getFullName(slotProps.data)}`"
+                                    class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                                    @error="handleImageError"
+                                />
+                                <div v-else class="w-10 h-10 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
+                                    <i class="pi pi-user text-gray-500"></i>
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
                     <Column field="email" header="Email"></Column>
                     <Column field="name" header="Nom">
                         <template #body="slotProps">

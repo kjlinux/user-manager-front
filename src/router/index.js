@@ -20,6 +20,16 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/profile',
+                    name: 'profile',
+                    component: () => import('@/views/pages/Profile.vue'),
+                    beforeEnter: requireAuth,
+                    meta: {
+                        title: 'Profil',
+                        requiresAuth: true
+                    }
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')

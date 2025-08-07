@@ -14,12 +14,29 @@ const user = computed(() => authStore.user);
 const roles = computed(() => authStore.roles);
 const permissions = computed(() => authStore.permissions);
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const username = computed(() => {
     if (user.value) {
         return user.value.name || 'Utilisateur';
     }
     return 'Profile';
 });
+
+const getProfilePhotoUrl = computed(() => {
+    if (user.value && user.value.profile_photo && user.value.profile_photo.file) {
+        return `${API_BASE_URL}/storage/${user.value.profile_photo.file}`;
+    }
+    return null;
+});
+
+const handleImageError = (event) => {
+    event.target.style.display = 'none';
+    const iconElement = event.target.nextElementSibling;
+    if (iconElement) {
+        iconElement.style.display = 'inline';
+    }
+};
 
 const handleLogout = async () => {
     await authStore.logout();
@@ -31,7 +48,7 @@ const goToProfile = () => {
 };
 
 const goToAdmin = () => {
-    router.push('/admin');
+    router.push('/dashboard');
 };
 
 const canAccessAdmin = computed(() => {
@@ -75,7 +92,10 @@ const canAccessAdmin = computed(() => {
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action" @click="goToProfile">
-                        <i class="pi pi-user"></i>
+                        <div class="profile-photo-container">
+                            <img v-if="getProfilePhotoUrl" :src="getProfilePhotoUrl" :alt="`Photo de ${username}`" class="profile-photo" @error="handleImageError" />
+                            <i class="pi pi-user profile-icon" :style="{ display: getProfilePhotoUrl ? 'none' : 'inline' }"></i>
+                        </div>
                         <span>{{ username }}</span>
                     </button>
 
@@ -93,3 +113,52 @@ const canAccessAdmin = computed(() => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.profile-photo-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+.profile-photo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.layout-topbar[data-theme='dark'] .profile-photo {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .profile-photo-container {
+        width: 20px;
+        height: 20px;
+    }
+
+    .profile-photo {
+        width: 20px;
+        height: 20px;
+    }
+
+    .profile-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+}
+</style>
