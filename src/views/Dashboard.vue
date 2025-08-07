@@ -467,7 +467,6 @@ function handleImageError(event) {
 
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
 
-                <!-- Nouvelle colonne pour la photo de profil -->
                 <Column header="Photo" style="width: 5rem" :exportable="false">
                     <template #body="slotProps">
                         <div class="flex justify-center">

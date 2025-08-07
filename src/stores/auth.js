@@ -82,6 +82,10 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
+        async fetchUser() {
+            return await this.getProfile();
+        },
+
         async logout() {
             this.loading = true;
 
