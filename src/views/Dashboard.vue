@@ -3,6 +3,7 @@ import apiClient from '@/service/apiClient';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const FilterMatchMode = {
     STARTS_WITH: 'startsWith',
@@ -30,6 +31,7 @@ const FilterOperator = {
 const router = useRouter();
 const toast = useToast();
 const dt = ref();
+const authStore = useAuthStore();
 
 const roles = ref([]);
 const loadingRoles = ref(false);
@@ -52,7 +54,6 @@ const filteredRoles = ref([]);
 const savingUser = ref(false);
 
 const statusOptions = reactive(['Actif', 'Inactif']);
-const roleOptions = computed(() => roles.value.map((role) => ({ label: role.name, value: role.id })));
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -84,11 +85,6 @@ const expandAll = () => {
 const collapseAll = () => {
     expandedRows.value = {};
 };
-
-const totalUsers = computed(() => users.value.length);
-const totalActive = computed(() => users.value.filter((user) => user.status === true || user.status === 'active').length);
-const totalInactive = computed(() => users.value.filter((user) => user.status === false || user.status === 'inactive').length);
-const totalDeleted = computed(() => blockedUsers.value.length);
 
 const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -446,9 +442,9 @@ function handleImageError(event) {
     event.target.style.display = 'none';
 }
 
-function getUserDetails(user) {
-    router.push({ name: 'user-details', params: { id: user.id } });
-}
+const goToLogs = () => {
+    router.push('/log');
+};
 </script>
 
 <template>
@@ -469,13 +465,13 @@ function getUserDetails(user) {
             tableStyle="min-width: 60rem"
         >
             <template #header>
-                <div class="flex flex-wrap justify-between gap-2">
+                <div v-role="'Administrateur'" class="flex flex-wrap justify-between gap-2">
                     <h2>Gestion des Utilisateurs</h2>
                     <div class="flex gap-2">
                         <Button label="Nouveau" icon="pi pi-plus" severity="secondary" @click="openNew" />
                         <Button label="Supprimer" icon="pi pi-trash" severity="danger" @click="confirmBlockSelected" :disabled="!selectedUsers || !selectedUsers.length" />
                         <Button label="Utilisateurs supprimés" icon="pi pi-user-minus" severity="secondary" @click="showBlockedUsers" />
-                        <Button label="Historique des actions" icon="pi pi-list" severity="secondary" @click="" />
+                        <Button label="Historique des actions" icon="pi pi-list" severity="secondary" @click="goToLogs" />
                         <Button type="button" icon="pi pi-filter-slash" label="Réinitialiser filtres" outlined @click="clearFilter()" />
                         <Button text icon="pi pi-plus" label="Développer tout" @click="expandAll" />
                         <Button text icon="pi pi-minus" label="Réduire tout" @click="collapseAll" />
@@ -494,7 +490,6 @@ function getUserDetails(user) {
             </template>
 
             <template #empty> Aucun utilisateur trouvé. </template>
-            <template #loading> ... </template>
 
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column expander style="width: 3rem" />
@@ -553,7 +548,7 @@ function getUserDetails(user) {
                 </template>
             </Column>
 
-            <Column headerStyle="min-width:15rem">
+            <Column headerStyle="min-width:15rem" v-if="authStore.hasRole('Administrateur')">
                 <template #header>
                     <div class="text-center">Actions</div>
                 </template>

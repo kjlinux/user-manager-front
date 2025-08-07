@@ -8,6 +8,7 @@ import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
+import { roleDirective } from '@/directives/roleDirective';
 
 import '@/assets/styles.scss';
 
@@ -29,6 +30,7 @@ app.use(PrimeVue, {
 });
 app.use(ToastService);
 app.use(ConfirmationService);
+app.directive('role', roleDirective);
 
 import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();

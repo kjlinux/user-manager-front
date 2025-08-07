@@ -9,7 +9,6 @@ const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
-const rememberMe = ref(false);
 const showPassword = ref(false);
 
 const loading = computed(() => authStore.loading);
@@ -23,10 +22,6 @@ const handleLogin = async () => {
     if (result.success) {
         router.push('/');
     }
-};
-
-const forgotPassword = () => {
-    router.push('/forgot-password');
 };
 </script>
 
@@ -98,26 +93,6 @@ const forgotPassword = () => {
                                     </svg>
                                 </button>
                             </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center">
-                                <input
-                                    v-model="rememberMe"
-                                    type="checkbox"
-                                    :disabled="loading"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 disabled:cursor-not-allowed"
-                                />
-                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Se souvenir de moi</span>
-                            </label>
-                            <button
-                                type="button"
-                                @click="forgotPassword"
-                                :disabled="loading"
-                                class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                Mot de passe oublié ?
-                            </button>
                         </div>
 
                         <button

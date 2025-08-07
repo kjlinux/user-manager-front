@@ -30,6 +30,16 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/log',
+                    name: 'log',
+                    component: () => import('@/views/pages/Log.vue'),
+                    beforeEnter: requireAuth,
+                    meta: {
+                        title: 'Log',
+                        requiresAuth: true
+                    }
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
