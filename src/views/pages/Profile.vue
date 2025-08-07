@@ -3,8 +3,10 @@ import apiClient from '@/service/apiClient';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const toast = useToast();
+const router = useRouter();
 const authStore = useAuthStore();
 const fileInput = ref(null);
 
@@ -299,6 +301,10 @@ const resetForm = async () => {
         showErrorToast('Erreur lors de la réinitialisation du formulaire');
     }
 };
+
+function goBack() {
+    router.back();
+}
 </script>
 
 <template>
@@ -306,7 +312,9 @@ const resetForm = async () => {
         <Toast position="top-right" />
 
         <input ref="fileInput" type="file" accept="image/*" @change="handleFileSelect" class="hidden-upload" />
-
+        <div class="flex gap-3">
+            <Button label="Retour" icon="pi pi-arrow-left" severity="secondary" @click="goBack" />
+        </div>
         <div class="profile-header">
             <div class="header-content">
                 <div class="avatar-section">
@@ -361,7 +369,7 @@ const resetForm = async () => {
                             <div class="form-group">
                                 <label for="name" class="form-label">
                                     <i class="pi pi-user"></i>
-                                    Nom complet *
+                                    Nom *
                                 </label>
                                 <InputText id="name" v-model="user.name" type="text" :class="{ 'p-invalid': errors.name }" class="form-input" placeholder="Entrez votre nom complet" maxlength="255" />
                                 <small v-if="errors.name" class="error-message">{{ errors.name }}</small>
