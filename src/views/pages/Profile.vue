@@ -129,12 +129,10 @@ const uploadProfilePhoto = async (file) => {
             }
         });
 
-        // Vérifier le statut de la réponse
         if (response.data.status === 'success') {
             await authStore.fetchUser();
             showSuccessToast('Photo de profil mise à jour avec succès!');
         } else {
-            // Si le serveur retourne un status différent de 'success'
             showErrorToast(response.data.message || 'Erreur lors de la mise à jour de la photo');
         }
 
