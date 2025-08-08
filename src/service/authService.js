@@ -63,7 +63,7 @@ class AuthService {
 
     async getProfile() {
         try {
-            const response = await axios.get(`${this.baseURL}/auth/profile/get`);
+            const response = await axios.get(`${this.baseURL}/auth/users/profile/get`);
 
             if (response.data.status === 'success') {
                 const userData = response.data.data;
