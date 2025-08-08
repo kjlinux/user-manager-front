@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { createPinia } from 'pinia';
-import { createApp } from 'vue';
+import { createApp, onMounted } from 'vue';
 import App from './App.vue';
 import router from './router';
 
@@ -34,6 +34,8 @@ app.directive('role', roleDirective);
 
 import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
-authStore.initializeAuth();
+onMounted(() => {
+    authStore.initializeAuth();
+});
 
 app.mount('#app');

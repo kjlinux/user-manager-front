@@ -79,7 +79,7 @@ const exportCSV = () => {
 
 <template>
     <div>
-        <div class="card">
+        <div class="card" v-role="'Administrateur'">
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="Retour" icon="pi pi-arrow-left" severity="secondary" class="mr-2" @click="goBack" />
