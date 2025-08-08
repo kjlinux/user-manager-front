@@ -32,7 +32,7 @@ const API_BASE_URL = import.meta.env.VITE_APP_URL;
 onMounted(async () => {
     if (!authStore.user) {
         try {
-            await authStore.fetchUser();
+            await authStore.getProfile();
         } catch (error) {
             console.error('Erreur lors du chargement des données utilisateur:', error);
             showErrorToast('Erreur lors du chargement des données utilisateur');
@@ -130,12 +130,11 @@ const uploadProfilePhoto = async (file) => {
         });
 
         if (response.data.status === 'success') {
-            await authStore.fetchUser();
+            await authStore.getProfile();
             showSuccessToast('Photo de profil mise à jour avec succès!');
         } else {
             showErrorToast(response.data.message || 'Erreur lors de la mise à jour de la photo');
         }
-
     } catch (error) {
         console.error('Erreur lors du téléchargement de la photo:', error);
 
@@ -153,7 +152,7 @@ const uploadProfilePhoto = async (file) => {
         } else if (error.request) {
             showErrorToast('Erreur de connexion au serveur');
         } else {
-            showErrorToast('Erreur lors de l\'upload du fichier');
+            showErrorToast("Erreur lors de l'upload du fichier");
         }
     } finally {
         uploadingPhoto.value = false;
@@ -252,7 +251,7 @@ const updateProfile = async () => {
 
         const response = await apiClient.post(`auth/users/update-profile/${userId.value}`, formData);
 
-        await authStore.fetchUser();
+        await authStore.getProfile();
 
         if (authStore.user) {
             user.value = {
