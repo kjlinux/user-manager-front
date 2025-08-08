@@ -129,12 +129,34 @@ const uploadProfilePhoto = async (file) => {
             }
         });
 
-        await authStore.fetchUser();
+        // Vérifier le statut de la réponse
+        if (response.data.status === 'success') {
+            await authStore.fetchUser();
+            showSuccessToast('Photo de profil mise à jour avec succès!');
+        } else {
+            // Si le serveur retourne un status différent de 'success'
+            showErrorToast(response.data.message || 'Erreur lors de la mise à jour de la photo');
+        }
 
-        showSuccessToast('Photo de profil mise à jour avec succès!');
     } catch (error) {
         console.error('Erreur lors du téléchargement de la photo:', error);
-        showErrorToast('Erreur de validation du fichier');
+
+        if (error.response) {
+            const statusCode = error.response.status;
+            const errorMessage = error.response.data?.message || 'Erreur de validation du fichier';
+
+            if (statusCode === 422) {
+                showErrorToast('Fichier invalide: ' + errorMessage);
+            } else if (statusCode === 413) {
+                showErrorToast('Fichier trop volumineux');
+            } else {
+                showErrorToast(errorMessage);
+            }
+        } else if (error.request) {
+            showErrorToast('Erreur de connexion au serveur');
+        } else {
+            showErrorToast('Erreur lors de l\'upload du fichier');
+        }
     } finally {
         uploadingPhoto.value = false;
     }
