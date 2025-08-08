@@ -94,13 +94,23 @@ export const useAuthStore = defineStore('auth', {
             } catch (error) {
                 console.error('Erreur lors de la déconnexion:', error);
             } finally {
-                this.user = null;
-                this.roles = [];
-                this.permissions = [];
-                this.isAuthenticated = false;
-                this.error = null;
-                this.loading = false;
+                this.clearAuthState();
             }
+        },
+
+        clearAuthState() {
+            this.user = null;
+            this.roles = [];
+            this.permissions = [];
+            this.isAuthenticated = false;
+            this.error = null;
+            this.loading = false;
+        },
+
+        forceLogout() {
+            console.log('Déconnexion forcée - Token expiré');
+            authService.clearLocalStorage();
+            this.clearAuthState();
         },
 
         async updateProfile(userData) {
@@ -132,6 +142,12 @@ export const useAuthStore = defineStore('auth', {
                 return user;
             } catch (error) {
                 console.error('Erreur lors de la récupération du profil:', error);
+                
+                if (error.response?.status === 401) {
+                    this.forceLogout();
+                    return null;
+                }
+                
                 throw error;
             }
         },
@@ -142,6 +158,9 @@ export const useAuthStore = defineStore('auth', {
                 this.roles = authService.getRoles();
                 this.permissions = authService.getPermissions();
                 this.isAuthenticated = true;
+            } else {
+                this.clearAuthState();
+                authService.clearLocalStorage();
             }
         },
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 class AuthService {
     constructor() {
         this.baseURL = 'http://127.0.0.1:8000/api/auth';
+        this.isLoggingOut = false;
         this.setupAxiosInterceptors();
     }
 
@@ -13,10 +14,25 @@ class AuthService {
             (response) => response,
             async (error) => {
                 if (error.response?.status === 401) {
-                    this.logout();
+                    if (this.isLoggingOut) {
+                        return Promise.reject(error);
+                    }
+
+                    console.log('Token expiré ou invalide, déconnexion...');
                     
-                    if (window.location.pathname !== '/auth/login') {
-                        window.location.href = '/auth/login';
+                    this.isLoggingOut = true;
+                    
+                    try {
+                        await this.logout();
+                        
+                        if (window.location.pathname !== '/auth/login' && 
+                            !window.location.pathname.includes('/auth/')) {
+                            window.location.href = '/auth/login';
+                        }
+                    } catch (logoutError) {
+                        console.error('Erreur lors de la déconnexion:', logoutError);
+                    } finally {
+                        this.isLoggingOut = false;
                     }
                 }
                 return Promise.reject(error);
@@ -77,15 +93,21 @@ class AuthService {
 
     async logout() {
         try {
-            await axios.post(`${this.baseURL}/users/logout`);
+            if (!this.isLoggingOut) {
+                await axios.post(`${this.baseURL}/users/logout`);
+            }
         } catch (error) {
-            console.error('Erreur lors de la déconnexion:', error);
+            console.warn('Erreur lors de la déconnexion serveur (ignorée):', error.message);
         } finally {
-            localStorage.removeItem('user');
-            localStorage.removeItem('roles');
-            localStorage.removeItem('permissions');
-            localStorage.removeItem('isAuthenticated');
+            this.clearLocalStorage();
         }
+    }
+
+    clearLocalStorage() {
+        localStorage.removeItem('user');
+        localStorage.removeItem('roles');
+        localStorage.removeItem('permissions');
+        localStorage.removeItem('isAuthenticated');
     }
 
     async getProfile() {
@@ -122,7 +144,7 @@ class AuthService {
     }
 
     isAuthenticated() {
-        return localStorage.getItem('isAuthenticated') === 'true';
+        return localStorage.getItem('isAuthenticated') === 'true' && this.getUser() !== null;
     }
 
     getUser() {

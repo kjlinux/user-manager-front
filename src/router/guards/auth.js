@@ -1,16 +1,29 @@
 import { useAuthStore } from '@/stores/auth';
+import authService from '@/service/authService';
 
 export const requireAuth = (to, from, next) => {
   const authStore = useAuthStore();
-
+  
   if (!authStore.isLoggedIn) {
+    console.log('Utilisateur non authentifié, redirection vers login');
     next({
       name: 'login',
       query: { redirect: to.fullPath }
     });
-  } else {
-    next();
+    return;
   }
+
+  if (!authService.isAuthenticated()) {
+    console.log('Token invalide ou expiré, nettoyage et redirection');
+    authStore.forceLogout();
+    next({
+      name: 'login',
+      query: { redirect: to.fullPath }
+    });
+    return;
+  }
+
+  next();
 };
 
 export const requireGuest = (to, from, next) => {
