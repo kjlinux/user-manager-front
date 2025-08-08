@@ -1,4 +1,3 @@
-import router from '@/router';
 import axios from 'axios';
 
 class AuthService {
@@ -59,6 +58,37 @@ class AuthService {
                 success: false,
                 message: error.response?.data?.message || 'Erreur de connexion'
             };
+        }
+    }
+
+    async getProfile() {
+        try {
+            const response = await axios.get(`${this.baseURL}/auth/profile/get`);
+
+            if (response.data.status === 'success') {
+                const userData = response.data.data;
+
+                const roles = userData.roles ? userData.roles.map((role) => role.code) : [];
+
+                const permissions = userData.permissions ? userData.permissions.map((perm) => perm.code) : [];
+
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('roles', JSON.stringify(roles));
+                localStorage.setItem('permissions', JSON.stringify(permissions));
+                localStorage.setItem('isAuthenticated', 'true');
+
+                return userData;
+            } else {
+                throw new Error(response.data.message || 'Erreur lors de la récupération du profil');
+            }
+        } catch (error) {
+            console.error('Erreur getProfile:', error);
+
+            if (error.response?.status === 401) {
+                throw error;
+            }
+
+            throw new Error(error.response?.data?.message || 'Erreur lors de la récupération du profil');
         }
     }
 
