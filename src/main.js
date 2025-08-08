@@ -4,16 +4,16 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
+import { roleDirective } from '@/directives/roleDirective';
 import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
-import { roleDirective } from '@/directives/roleDirective';
 
 import '@/assets/styles.scss';
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://127.0.0.1:8000';
+axios.defaults.baseURL = import.meta.env.VITE_APP_URL;
 
 const app = createApp(App);
 const pinia = createPinia();

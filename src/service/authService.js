@@ -2,7 +2,7 @@ import axios from 'axios';
 
 class AuthService {
     constructor() {
-        this.baseURL = 'http://127.0.0.1:8000/api/auth';
+        this.baseURL = import.meta.env.VITE_API_URL;
         this.isLoggingOut = false;
         this.setupAxiosInterceptors();
     }
@@ -19,14 +19,13 @@ class AuthService {
                     }
 
                     console.log('Token expiré ou invalide, déconnexion...');
-                    
+
                     this.isLoggingOut = true;
-                    
+
                     try {
                         await this.logout();
-                        
-                        if (window.location.pathname !== '/auth/login' && 
-                            !window.location.pathname.includes('/auth/')) {
+
+                        if (window.location.pathname !== '/auth/login' && !window.location.pathname.includes('/auth/')) {
                             window.location.href = '/auth/login';
                         }
                     } catch (logoutError) {
@@ -42,7 +41,7 @@ class AuthService {
 
     async login(email, password) {
         try {
-            const response = await axios.post(`${this.baseURL}/login`, {
+            const response = await axios.post(`${this.baseURL}/auth/login`, {
                 email,
                 password
             });
@@ -71,7 +70,7 @@ class AuthService {
 
     async register(userData) {
         try {
-            const response = await axios.post(`${this.baseURL}/users/register`, userData);
+            const response = await axios.post(`${this.baseURL}/auth/users/register`, userData);
 
             if (response.data.status === 'success') {
                 localStorage.setItem('user', JSON.stringify(response.data.data));
@@ -94,7 +93,7 @@ class AuthService {
     async logout() {
         try {
             if (!this.isLoggingOut) {
-                await axios.post(`${this.baseURL}/users/logout`);
+                await axios.post(`${this.baseURL}/auth/users/logout`);
             }
         } catch (error) {
             console.warn('Erreur lors de la déconnexion serveur (ignorée):', error.message);
@@ -112,7 +111,7 @@ class AuthService {
 
     async getProfile() {
         try {
-            const response = await axios.get(`${this.baseURL}/users/profile/get`);
+            const response = await axios.get(`${this.baseURL}/auth/users/profile/get`);
             if (response.data.status === 'success') {
                 localStorage.setItem('user', JSON.stringify(response.data.data));
                 return response.data.data;
@@ -125,7 +124,7 @@ class AuthService {
     async updateProfile(userData) {
         try {
             const user = this.getUser();
-            const response = await axios.post(`${this.baseURL}/users/update-profile/${user.id}`, userData);
+            const response = await axios.post(`${this.baseURL}/auth/users/update-profile/${user.id}`, userData);
 
             if (response.data.status === 'success') {
                 localStorage.setItem('user', JSON.stringify(response.data.data));

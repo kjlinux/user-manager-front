@@ -14,7 +14,7 @@ const user = computed(() => authStore.user);
 const roles = computed(() => authStore.roles);
 const permissions = computed(() => authStore.permissions);
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_APP_URL;
 
 const username = computed(() => {
     if (user.value) {

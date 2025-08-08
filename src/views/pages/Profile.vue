@@ -27,7 +27,7 @@ const errors = ref({});
 const passwordStrength = ref(0);
 const loading = ref(false);
 const uploadingPhoto = ref(false);
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_APP_URL;
 
 onMounted(async () => {
     if (!authStore.user) {
