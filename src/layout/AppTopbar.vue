@@ -6,7 +6,6 @@ import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
-
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -58,13 +57,6 @@ const canAccessAdmin = computed(() => {
 
 <template>
     <div class="layout-topbar">
-        <div class="layout-topbar-logo-container">
-            <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
-                <i class="pi pi-bars"></i>
-            </button>
-            <router-link to="/" class="layout-topbar-logo"> </router-link>
-        </div>
-
         <div class="layout-topbar-actions">
             <div class="layout-config-menu hidden">
                 <button type="button" class="layout-topbar-action hidden" @click="toggleDarkMode">
@@ -81,14 +73,12 @@ const canAccessAdmin = computed(() => {
                     <AppConfigurator />
                 </div>
             </div>
-
             <button
                 class="layout-topbar-menu-button layout-topbar-action"
                 v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
             >
                 <i class="pi pi-ellipsis-v"></i>
             </button>
-
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action" @click="goToProfile">
@@ -98,12 +88,10 @@ const canAccessAdmin = computed(() => {
                         </div>
                         <span>{{ username }}</span>
                     </button>
-
                     <button v-if="canAccessAdmin" type="button" class="layout-topbar-action" @click="goToAdmin">
                         <i class="pi pi-cog"></i>
                         <span>Administration</span>
                     </button>
-
                     <button type="button" class="layout-topbar-action" @click="handleLogout">
                         <i class="pi pi-power-off"></i>
                         <span>Déconnexion</span>
@@ -119,25 +107,34 @@ const canAccessAdmin = computed(() => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin-right: 5px;
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    flex-shrink: 0; /* Empêche la déformation */
 }
 
 .profile-photo {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px; /* Force les dimensions exactes */
+    min-height: 32px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    display: block; /* Assure un affichage correct */
 }
 
 .profile-icon {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .layout-topbar[data-theme='dark'] .profile-photo {
@@ -146,18 +143,23 @@ const canAccessAdmin = computed(() => {
 
 @media (max-width: 768px) {
     .profile-photo-container {
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
+        margin-right: 6px;
     }
-
+    
     .profile-photo {
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
     }
-
+    
     .profile-icon {
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
         font-size: 14px;
     }
 }

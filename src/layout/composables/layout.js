@@ -5,7 +5,7 @@ const layoutConfig = reactive({
     primary: 'azure',
     surface: null,
     darkTheme: false,
-    menuMode: 'static'
+    menuMode: 'overlay'
 });
 
 const layoutState = reactive({

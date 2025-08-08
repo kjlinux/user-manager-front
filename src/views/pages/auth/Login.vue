@@ -1,5 +1,4 @@
 <script setup>
-import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
 import { useAuthStore } from '@/stores/auth';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -26,7 +25,6 @@ const handleLogin = async () => {
 </script>
 
 <template>
-    <FloatingConfigurator />
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div class="w-full max-w-md">
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-sm bg-opacity-95">
